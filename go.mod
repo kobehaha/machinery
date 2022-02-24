@@ -23,4 +23,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/RichardKnop/machinery v1.10.6 => github.com/kobehaha/machinery v1.10.6
+replace github.com/RichardKnop/machinery => github.com/kobehaha/machinery v1.10.6
