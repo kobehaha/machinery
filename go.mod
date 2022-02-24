@@ -33,3 +33,4 @@ require (
 )
 
 replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110319-2566ecd5d999
+replace github.com/RichardKnop/machinery/v2 v2.0.11 => github.com/kobehaha/machinery/v2 v2.0.11
