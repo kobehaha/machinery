@@ -22,3 +22,5 @@ require (
 	go.mongodb.org/mongo-driver v1.8.3
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+replace github.com/RichardKnop/machinery v1.10.6 => github.com/kobehaha/machinery v1.10.6
