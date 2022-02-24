@@ -2,12 +2,13 @@ package redis
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 	"time"
-
+	"fmt"
+	"math/rand"
 	"github.com/RichardKnop/machinery/v2/config"
 	"github.com/go-redis/redis/v8"
+	"github.com/RichardKnop/machinery/v2/log"
 )
 
 var (
@@ -54,9 +55,11 @@ func (r Lock) LockWithRetries(key string, unixTsToExpireNs int64) error {
 		if err == nil {
 			//成功拿到锁，返回
 			return nil
+		} else {
+			log.DEBUG.Println(fmt.Sprintf("retry %d to get lock failed, basic info is  %s", i, err.Error()))
 		}
-
-		time.Sleep(r.interval)
+		r := rand.Intn(5)
+		time.Sleep(time.Duration(r) * time.Second)
 	}
 	return ErrRedisLockFailed
 }
@@ -70,40 +73,13 @@ func (r Lock) Lock(key string, unixTsToExpireNs int64) error {
 	if err != nil {
 		return err
 	}
-
 	if !success {
-		v, err := r.rclient.Get(ctx, key).Result()
+		ttl, err := r.rclient.TTL(ctx, key).Result()
 		if err != nil {
 			return err
 		}
-		timeout, err := strconv.Atoi(v)
-		if err != nil {
-			return err
-		}
-
-		if timeout != 0 && now > int64(timeout) {
-			newTimeout, err := r.rclient.GetSet(ctx, key, unixTsToExpireNs).Result()
-			if err != nil {
-				return err
-			}
-
-			curTimeout, err := strconv.Atoi(newTimeout)
-			if err != nil {
-				return err
-			}
-
-			if now > int64(curTimeout) {
-				// success to acquire lock with get set
-				// set the expiration of redis key
-				r.rclient.Expire(ctx, key, expiration)
-				return nil
-			}
-
-			return ErrRedisLockFailed
-		}
-
+		log.DEBUG.Printf("set lock failed, current exist lock ttl is %d", ttl.Seconds())
 		return ErrRedisLockFailed
 	}
-
 	return nil
 }
