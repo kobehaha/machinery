@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go"
-	
+
 	"github.com/RichardKnop/machinery/v2/backends/amqp"
 	"github.com/RichardKnop/machinery/v2/brokers/errs"
 	"github.com/RichardKnop/machinery/v2/log"
@@ -179,7 +179,8 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	}
 
 	// Call the task
-	results, err := task.Call()
+	results, err, trace := task.Call()
+	signature.Trace = trace
 	if err != nil {
 		// If a tasks.ErrRetryTaskLater was returned from the task,
 		// retry the task after specified duration
