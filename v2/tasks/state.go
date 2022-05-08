@@ -1,6 +1,8 @@
 package tasks
 
 import "time"
+import "encoding/json"
+import "github.com/RichardKnop/machinery/v2/log"
 
 const (
 	// StatePending - initial state of a task
@@ -26,6 +28,8 @@ type TaskState struct {
 	Error     string        `bson:"error"`
 	CreatedAt time.Time     `bson:"created_at"`
 	TTL       int64         `bson:"ttl,omitempty"`
+	Headers   string        `bson:"header"`
+	Trace     string        `bson:"trace"`
 }
 
 // GroupMeta stores useful metadata about tasks within the same group
@@ -42,11 +46,15 @@ type GroupMeta struct {
 
 // NewPendingTaskState ...
 func NewPendingTaskState(signature *Signature) *TaskState {
+	headers, _ := json.Marshal(signature.Headers)
+
 	return &TaskState{
 		TaskUUID:  signature.UUID,
 		TaskName:  signature.Name,
 		State:     StatePending,
 		CreatedAt: time.Now().UTC(),
+		Headers:   string(headers),
+		Trace:     signature.Trace,
 	}
 }
 
