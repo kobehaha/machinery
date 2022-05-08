@@ -153,6 +153,7 @@ func (b *Backend) mergeNewTaskState(conn redis.Conn, newState *tasks.TaskState) 
 	if err == nil {
 		newState.CreatedAt = state.CreatedAt
 		newState.TaskName = state.TaskName
+		newState.Headers = state.Headers
 	}
 }
 
@@ -212,6 +213,7 @@ func (b *Backend) SetStateFailure(signature *tasks.Signature, err string) error 
 
 	taskState := tasks.NewFailureTaskState(signature, err)
 	b.mergeNewTaskState(conn, taskState)
+	taskState.Trace = signature.Trace
 	return b.updateState(conn, taskState)
 }
 
