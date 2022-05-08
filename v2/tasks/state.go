@@ -2,7 +2,6 @@ package tasks
 
 import "time"
 import "encoding/json"
-import "github.com/RichardKnop/machinery/v2/log"
 
 const (
 	// StatePending - initial state of a task
