@@ -46,6 +46,7 @@ func (h Headers) ForeachKey(handler func(key, val string) error) error {
 type Signature struct {
 	UUID           string
 	Name           string
+	Trace          string
 	RoutingKey     string
 	ETA            *time.Time
 	GroupUUID      string
