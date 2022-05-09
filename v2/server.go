@@ -161,9 +161,10 @@ func (server *Server) SendTaskWithContext(ctx context.Context, signature *tasks.
 
 	// Auto generate a UUID if not set already
 	if signature.UUID == "" {
-		taskID := uuid.New().String()
-		signature.UUID = fmt.Sprintf("task_%v", taskID)
+		taskID := uuid.New().ID()
+		signature.UUID = fmt.Sprintf("%d", int(taskID))
 	}
+
 
 	// Set initial task state to PENDING
 	if err := server.backend.SetStatePending(signature); err != nil {
