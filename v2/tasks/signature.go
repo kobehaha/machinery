@@ -60,6 +60,8 @@ type Signature struct {
 	OnSuccess      []*Signature
 	OnError        []*Signature
 	ChordCallback  *Signature
+	Err            error
+	Results        []*TaskResult
 	//MessageGroupId for Broker, e.g. SQS
 	BrokerMessageGroupId string
 	//ReceiptHandle of SQS Message

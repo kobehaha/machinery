@@ -35,6 +35,18 @@ type Server struct {
 	prePublishHandler func(*tasks.Signature)
 }
 
+func NewServerWithNotScheduler(cnf *config.Config, brokerServer brokersiface.Broker, backendServer backendsiface.Backend, lock lockiface.Lock) *Server {
+	srv := &Server{
+		config:          cnf,
+		registeredTasks: new(sync.Map),
+		broker:          brokerServer,
+		backend:         backendServer,
+		lock:            lock,
+		scheduler:       cron.New(),
+	}
+	return srv
+}
+
 // NewServer creates Server instance
 func NewServer(cnf *config.Config, brokerServer brokersiface.Broker, backendServer backendsiface.Backend, lock lockiface.Lock) *Server {
 	srv := &Server{
@@ -161,10 +173,8 @@ func (server *Server) SendTaskWithContext(ctx context.Context, signature *tasks.
 
 	// Auto generate a UUID if not set already
 	if signature.UUID == "" {
-		taskID := uuid.New().ID()
-		signature.UUID = fmt.Sprintf("%d", int(taskID))
+		signature.UUID = uuid.New().String()
 	}
-
 
 	// Set initial task state to PENDING
 	if err := server.backend.SetStatePending(signature); err != nil {

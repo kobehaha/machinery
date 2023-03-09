@@ -179,8 +179,12 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	}
 
 	// Call the task
+
+	os.Setenv("taskId", signature.UUID)
 	results, err, trace := task.Call()
 	signature.Trace = trace
+	signature.Err = err
+	signature.Results = results
 	if err != nil {
 		// If a tasks.ErrRetryTaskLater was returned from the task,
 		// retry the task after specified duration
